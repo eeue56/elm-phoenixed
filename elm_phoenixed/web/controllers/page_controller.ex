@@ -5,20 +5,6 @@ defmodule ElmPhoenixed.PageController do
     render conn, "index.html"
   end
 
-  def gather_args(nil) do [] end
-  def gather_args(action) do gather_args(action, 0) end
-  def gather_args(action, index) do
-    current_index = "_#{index}"
-    value = Map.get(action, current_index)
-
-    if value == nil do
-      [ ]
-    else
-      [ value | gather_args(action, index + 1) ]
-    end
-  end
-
-  @spec run_action(char_list, list, number) :: number
   def run_action("Sub", model, n) do model - n end
   def run_action("Add", model, n) do model + n end
   def run_action("AddTwo", model, n, m) do n + m end
@@ -30,12 +16,10 @@ defmodule ElmPhoenixed.PageController do
 
   def api(conn, params) do
     action = Map.get(params, "action")
-    args = gather_args(action)
+    args = Elmxir.gather_args(action)
     model = Map.get(params, "model")
 
-    IO.inspect action
-
-    action_name = Map.get(action, "ctor")
+    action_name = Elmxir.get_action_name(action)
 
     full_arguments = [ action_name, model ] ++ args
 
